@@ -1,5 +1,5 @@
 {
-    "name": "ibrows/sonata-translation-bundle",
+    "name": "sfmmo/sonata-translation-bundle",
     "description": "Integration of lexik translation into sonata admin",
     "keywords": ["ibrows", "lexik", "translation", "sonata"],
     "type": "symfony-bundle",
@@ -8,7 +8,7 @@
         "php": ">=5.3.0",
         "symfony/framework-bundle": ">=2.1",
         "sonata-project/admin-bundle": "*",
-        "lexik/translation-bundle": "*"
+        "sfmmo/translation-bundle": "dev-master"
     },
     "autoload": {
         "psr-4": { "Ibrows\\SonataTranslationBundle\\": "" }
