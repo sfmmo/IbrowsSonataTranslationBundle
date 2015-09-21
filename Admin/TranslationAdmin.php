@@ -4,7 +4,6 @@ namespace Ibrows\SonataTranslationBundle\Admin;
 
 use Sonata\AdminBundle\Route\RouteCollection;
 use Lexik\Bundle\TranslationBundle\Manager\TransUnitManagerInterface;
-use Sonata\AdminBundle\Model\ModelManagerInterface;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Admin\Admin;
@@ -81,7 +80,6 @@ abstract class TranslationAdmin extends Admin
         return $this->defaultSelections;
     }
 
-
     /**
      * @return array
      */
@@ -116,6 +114,8 @@ abstract class TranslationAdmin extends Admin
                 'domain' => array(
                     'value' => $this->getDefaultDomain(),
                 ),
+
+                'translation_domain' => 'LexikTranslationBundle'
             ),
             $this->datagridValues
 
@@ -126,6 +126,7 @@ abstract class TranslationAdmin extends Admin
 
     /**
      * @param unknown $name
+     *
      * @return multitype:|NULL
      */
     public function getTemplate($name)
@@ -143,6 +144,7 @@ abstract class TranslationAdmin extends Admin
 
     /**
      * @param string $name
+     *
      * @return string
      */
     public function getOriginalTemplate($name)
@@ -156,8 +158,8 @@ abstract class TranslationAdmin extends Admin
     protected function configureRoutes(RouteCollection $collection)
     {
         $collection
-            ->add('clear_cache')
-            ->add('create_trans_unit');
+            ->add('clear_cache', null, array('label' => 'action.clear_cache'))
+            ->add('create_trans_unit', null, array('label' => 'translations.create_trans_unit'));
     }
 
     /**
@@ -167,8 +169,8 @@ abstract class TranslationAdmin extends Admin
     {
         $list
             ->add('id', 'integer')
-            ->add('key', 'string')
-            ->add('domain', 'string');
+            ->add('key', 'string', array('label' => 'translations.key', 'translation_domain' => 'LexikTranslationBundle'))
+            ->add('domain', 'string', array('label' => 'translations.domain', 'translation_domain' => 'LexikTranslationBundle'));
 
         $localesToShow = count($this->filterLocales) > 0 ? $this->filterLocales : $this->managedLocales;
 
@@ -214,8 +216,8 @@ abstract class TranslationAdmin extends Admin
         }
 
         $form
-            ->add('key', 'text')
-            ->add('domain', 'text');
+            ->add('key', 'text', array('label' => 'translations.key'), array('translation_domain' => 'LexikTranslationBundle'))
+            ->add('domain', 'text', array('label' => 'translations.domain'), array('translation_domain' => 'LexikTranslationBundle'));
     }
 
     /**
@@ -239,7 +241,7 @@ abstract class TranslationAdmin extends Admin
      */
     public function getBatchActions()
     {
-        $actions = parent::getBatchActions();
+        $actions             = parent::getBatchActions();
         $actions['download'] = array(
             'label'            => $this->trans($this->getLabelTranslatorStrategy()->getLabel('download', 'batch', 'IbrowsSonataTranslationBundle')),
             'ask_confirmation' => false,

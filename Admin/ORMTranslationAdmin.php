@@ -9,13 +9,12 @@ use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
 
 class ORMTranslationAdmin extends TranslationAdmin
 {
-
     protected function configureDatagridFilters(DatagridMapper $filter)
     {
         /** @var \Doctrine\ORM\EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManagerForClass('Lexik\Bundle\TranslationBundle\Entity\File');
 
-        $domains = array();
+        $domains            = array();
         $domainsQueryResult = $em->createQueryBuilder()
             ->select('DISTINCT t.domain')->from('\Lexik\Bundle\TranslationBundle\Entity\File', 't')
             ->getQuery()
@@ -34,7 +33,7 @@ class ORMTranslationAdmin extends TranslationAdmin
                 'locale',
                 'doctrine_orm_callback',
                 array(
-                    'callback'      => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
+                    'callback' => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
                         /* @var $queryBuilder \Doctrine\ORM\QueryBuilder */
                         if (!isset($options['value']) || empty($options['value'])) {
                             return;
@@ -46,17 +45,17 @@ class ORMTranslationAdmin extends TranslationAdmin
                         'choices'  => $this->formatLocales($this->managedLocales),
                         'required' => false,
                         'multiple' => true,
-                        'expanded' => false
+                        'expanded' => false,
                     ),
-                    'field_type'    => 'choice',
+                    'field_type' => 'choice',
+                    'label'      => 'locale',
                 )
             )
             ->add(
                 'show_non_translated_only',
                 'doctrine_orm_callback',
-                array
-                (
-                    'callback'      => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
+                array(
+                    'callback' => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
                         /* @var $queryBuilder \Doctrine\ORM\QueryBuilder */
                         if (!isset($options['value']) || empty($options['value']) || false === $options['value']) {
                             return;
@@ -69,20 +68,23 @@ class ORMTranslationAdmin extends TranslationAdmin
                             } else {
                                 $queryBuilder->orWhere('translations.content LIKE :content')->setParameter(
                                     'content',
-                                    $prefix . '%'
+                                    $prefix.'%'
                                 );
                             }
-
                         }
                     },
                     'field_options' => array(
                         'required' => true,
                         'value'    => $this->getNonTranslatedOnly(),
                     ),
-                    'field_type'    => 'checkbox',
+                    'field_type' => 'checkbox',
+                    'label'      => 'show_non_translated_only',
                 )
             )
-            ->add('key', 'doctrine_orm_string')
+            ->add('key', 'doctrine_orm_string', array(
+                'label'              => 'translations.key',
+                'translation_domain' => 'LexikTranslationBundle',
+            ))
             ->add(
                 'domain',
                 'doctrine_orm_choice',
@@ -93,17 +95,18 @@ class ORMTranslationAdmin extends TranslationAdmin
                         'multiple'    => false,
                         'expanded'    => false,
                         'empty_value' => 'all',
-                        'empty_data'  => 'all'
+                        'empty_data'  => 'all',
                     ),
-                    'field_type'    => 'choice',
+                    'field_type'         => 'choice',
+                    'label'              => 'translations.domain',
+                    'translation_domain' => 'LexikTranslationBundle',
                 )
             )
             ->add(
                 'content',
                 'doctrine_orm_callback',
-                array
-                (
-                    'callback'   => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
+                array(
+                    'callback' => function (ProxyQuery $queryBuilder, $alias, $field, $options) {
                         /* @var $queryBuilder \Doctrine\ORM\QueryBuilder */
                         if (!isset($options['value']) || empty($options['value'])) {
                             return;
@@ -111,11 +114,11 @@ class ORMTranslationAdmin extends TranslationAdmin
                         $this->joinTranslations($queryBuilder, $alias);
                         $queryBuilder->andWhere('translations.content LIKE :content')->setParameter(
                             'content',
-                            '%' . $options['value'] . '%'
+                            '%'.$options['value'].'%'
                         );
                     },
-                    'field_type' => 'text',
-                    'label'      => 'content',
+                    'field_type'         => 'text',
+                    'label'              => 'content'
                 )
             );
     }
@@ -127,7 +130,7 @@ class ORMTranslationAdmin extends TranslationAdmin
     private function joinTranslations(ProxyQuery $queryBuilder, $alias, array $locales = null)
     {
         $alreadyJoined = false;
-        $joins = $queryBuilder->getDQLPart('join');
+        $joins         = $queryBuilder->getDQLPart('join');
         if (array_key_exists($alias, $joins)) {
             $joins = $joins[$alias];
             foreach ($joins as $join) {
@@ -137,7 +140,7 @@ class ORMTranslationAdmin extends TranslationAdmin
             }
         }
         if (!$alreadyJoined) {
-            /** @var QueryBuilder $queryBuilder */
+            /* @var QueryBuilder $queryBuilder */
             if ($locales) {
                 $queryBuilder->leftJoin(sprintf('%s.translations', $alias), 'translations', 'WITH', 'translations.locale = :locales');
                 $queryBuilder->setParameter('locales', $locales);
